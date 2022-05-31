@@ -1,4 +1,4 @@
-package gg.matthew.commands;
+package gg.matthew.commands.manage;
 
 import gg.matthew.core.ManHunt;
 import gg.matthew.core.utils.Utils;

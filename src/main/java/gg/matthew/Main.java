@@ -1,7 +1,7 @@
 package gg.matthew;
 
-import gg.matthew.commands.Start;
-import gg.matthew.commands.Stop;
+import gg.matthew.commands.manage.Start;
+import gg.matthew.commands.manage.Stop;
 import gg.matthew.event.Events;
 import gg.overcast.api.command.CommandManager;
 import org.bukkit.Bukkit;
