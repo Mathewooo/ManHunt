@@ -1,0 +1,4 @@
+name: ManHunt
+version: '${version}'
+main: gg.matthew.Main
+api-version: 1.18
