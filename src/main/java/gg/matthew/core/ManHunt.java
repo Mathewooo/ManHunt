@@ -129,7 +129,8 @@ public class ManHunt {
                 huntersCompasses.put(uuid, Bukkit.getPlayer(uuid).getInventory().getItemInOffHand());
         }
     }
-
+    
+    //TODO try to make It so you won't use repeated task but make It somehow so It only updates desired Compass on when nearest runner moves (an event)
     //FIX lodestone glitching in end and nether
     private void settingLodestone() {
         //TODO make check for the change in worlds
