@@ -51,17 +51,25 @@ public class Start extends SubCommand {
                         }
                     }
                     if (canContinue) {
+                        List<String> hunters = new ArrayList<>();
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            if (!argsPlayers.contains(player.getName())) {
+                                hunters.add(player.getName());
+                            }
+                        }
                         ManHunt.getInstance().setGameStarted();
                         ManHunt.getInstance().setRunners(argsPlayers);
-                        ManHunt.getInstance().setHunters(argsPlayers);
-                        ManHunt.getInstance().enableUtilityThingsForStartedGame();
+                        ManHunt.getInstance().setHunters(hunters);
+                        ManHunt.getInstance().startGame();
                         Bukkit.broadcastMessage(ChatColor.WHITE + "ManHunt" + ChatColor.GRAY + " game has started" + ChatColor.WHITE + "!");
+                        argsPlayers.clear();
+                        hunters.clear();
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "ManHunt game is currently running!");
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "You cannot start ManHunt game just with yourself!");
+                sender.sendMessage(ChatColor.RED + "You cannot start a ManHunt game just with yourself!");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "Please reference at least one player as runner to start game!");

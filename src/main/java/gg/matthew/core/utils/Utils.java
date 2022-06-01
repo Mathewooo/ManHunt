@@ -15,10 +15,12 @@ public class Utils {
     public static Player getNearestPlayer(Player checkNear) {
         Player nearest = null;
         for (Player player : checkNear.getWorld().getPlayers()) {
-            if (ManHunt.getInstance().getRunners().contains(player.getUniqueId())) {
-                if (nearest == null) nearest = player;
-                else if (player.getLocation().distance(checkNear.getLocation()) < nearest.getLocation().distance(checkNear.getLocation()))
-                    nearest = player;
+            if (player != checkNear) {
+                if (ManHunt.getInstance().getRunners().contains(player.getUniqueId())) {
+                    if (nearest == null) nearest = player;
+                    else if (player.getLocation().distance(checkNear.getLocation()) < nearest.getLocation().distance(checkNear.getLocation()))
+                        nearest = player;
+                }
             }
         }
         return nearest;
