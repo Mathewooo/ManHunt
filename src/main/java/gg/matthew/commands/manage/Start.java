@@ -31,6 +31,7 @@ public class Start extends SubCommand {
         return "/manhunt start (player) (player) ...";
     }
 
+    //Cancel that you can choose all players from server as runners
     @Override
     public void perform(CommandSender sender, String[] args) {
         if (args.length >= 2) {
@@ -39,9 +40,8 @@ public class Start extends SubCommand {
                     boolean canContinue = true;
                     List<String> argsPlayers = new ArrayList<>();
                     Arrays.stream(args).forEach(argsPlayer -> {
-                        if (!argsPlayers.contains(argsPlayer) && !Objects.equals(argsPlayer, getName())) {
+                        if (!argsPlayers.contains(argsPlayer) && !Objects.equals(argsPlayer, getName()))
                             argsPlayers.add(argsPlayer);
-                        }
                     });
                     for (String player : argsPlayers) {
                         if (Utils.isPlayerOnline(player) == null) {
@@ -53,17 +53,13 @@ public class Start extends SubCommand {
                     if (canContinue) {
                         List<String> hunters = new ArrayList<>();
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (!argsPlayers.contains(player.getName())) {
-                                hunters.add(player.getName());
-                            }
+                            if (!argsPlayers.contains(player.getName())) hunters.add(player.getName());
                         }
                         ManHunt.getInstance().setGameStarted();
                         ManHunt.getInstance().setRunners(argsPlayers);
                         ManHunt.getInstance().setHunters(hunters);
                         ManHunt.getInstance().startGame();
                         Bukkit.broadcastMessage(ChatColor.WHITE + "ManHunt" + ChatColor.GRAY + " game has started" + ChatColor.WHITE + "!");
-                        argsPlayers.clear();
-                        hunters.clear();
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "ManHunt game is currently running!");

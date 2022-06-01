@@ -16,6 +16,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
+//MAKE WHOLE CLASS much cleaner and simpler
+
 public class ManHunt {
     private static ManHunt instance;
     private final Vector<UUID> hunters = new Vector<>();
@@ -27,9 +29,7 @@ public class ManHunt {
     private boolean gameStarted = false;
 
     public static synchronized ManHunt getInstance() {
-        if (instance == null) {
-            instance = new ManHunt();
-        }
+        if (instance == null) instance = new ManHunt();
         return instance;
     }
 
@@ -54,12 +54,9 @@ public class ManHunt {
     }
 
     public void setHunters(List<String> players) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!players.contains(player.getName())) {
-                hunters.add(player.getUniqueId());
-            }
+        for (String hunter : players) {
+            hunters.add(Bukkit.getPlayer(hunter).getUniqueId());
         }
-        Bukkit.getLogger().info(String.valueOf(hunters));
     }
 
     public List<UUID> getRunners() {
@@ -70,7 +67,6 @@ public class ManHunt {
         for (String runner : players) {
             runners.add(Bukkit.getPlayer(runner).getUniqueId());
         }
-        Bukkit.getLogger().info(String.valueOf(runners));
     }
 
     public void startGame() {
@@ -92,14 +88,7 @@ public class ManHunt {
         NameTags.getInstance().removeTags();
         disableGlowing();
         merged.clear();
-        for (UUID uuid : hunters) {
-            for (ItemStack itemStack : Bukkit.getPlayer(uuid).getInventory().getContents()) {
-                if (itemStack != null && Objects.equals(itemStack.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
-                    Bukkit.getPlayer(uuid).getInventory().remove(itemStack);
-                    break;
-                }
-            }
-        }
+        removeCompasses();
         hunters.clear();
         runners.clear();
         cancelTask();
@@ -112,6 +101,23 @@ public class ManHunt {
         }
     }
 
+    private void removeCompasses() {
+        for (UUID uuid : hunters) {
+            boolean shouldContinue = true;
+            for (ItemStack itemStack : Bukkit.getPlayer(uuid).getInventory().getContents()) {
+                if (itemStack != null && Objects.equals(itemStack.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
+                    Bukkit.getPlayer(uuid).getInventory().remove(itemStack);
+                    shouldContinue = false;
+                    break;
+                }
+            }
+            //DOESN't WORK
+            if (shouldContinue && Bukkit.getPlayer(uuid).getInventory().getItemInOffHand() != null)
+                if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
+                    Bukkit.getPlayer(uuid).getInventory().setItemInOffHand(null);
+        }
+    }
+
     private void createCompasses() {
         ItemStack compass = new ItemStack(Material.COMPASS);
         CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
@@ -119,9 +125,8 @@ public class ManHunt {
         compass.setItemMeta(compassMeta);
         for (UUID uuid : hunters) {
             Bukkit.getPlayer(uuid).getInventory().setItemInOffHand(compass);
-            if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
+            if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
                 huntersCompasses.put(uuid, Bukkit.getPlayer(uuid).getInventory().getItemInOffHand());
-            }
         }
     }
 
@@ -132,9 +137,8 @@ public class ManHunt {
             for (Map.Entry<UUID, ItemStack> entry : huntersCompasses.entrySet()) {
                 if (Bukkit.getPlayer(entry.getKey()) != null) {
                     Player nearestPlayer = Utils.getNearestPlayer(Bukkit.getPlayer(entry.getKey()));
-                    if (nearestPlayer != null) {
+                    if (nearestPlayer != null)
                         Bukkit.getPlayer(entry.getKey()).setCompassTarget(nearestPlayer.getLocation());
-                    }
                     ItemMeta itemMeta = entry.getValue().getItemMeta();
                     itemMeta.setLore(Collections.singletonList(nearestPlayer != null ? ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + nearestPlayer.getName() : ChatColor.WHITE + "Players went to different dimension"));
                     entry.getValue().setItemMeta(itemMeta);
@@ -143,6 +147,7 @@ public class ManHunt {
         }, 0, 4);
     }
 
+    //At some point implement configurable feature where only runners can see the glowing hunters not hunters seeing glowing hunter (can be done through nms) (implement in version 1.1)
     private void setGlowing() {
         for (UUID uuid : hunters) {
             Bukkit.getPlayer(uuid).setGlowing(true);
@@ -162,6 +167,5 @@ public class ManHunt {
     private void setMerged() {
         merged.addAll(hunters);
         merged.addAll(runners);
-        Bukkit.getLogger().info(String.valueOf(merged));
     }
 }
