@@ -1,7 +1,7 @@
 package gg.matthew.event;
 
 import gg.matthew.core.ManHunt;
-import gg.matthew.core.particle.Particle;
+import gg.matthew.core.particle.armorstand.Circle;
 import gg.matthew.core.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -60,7 +61,6 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        Particle.getInstance().spawnWinnerEffect(player);
         if (ManHunt.getInstance().hasGameStarted() && ManHunt.getInstance().getRunners().contains(player.getUniqueId())) {
             Player nearestPlayer = Utils.getNearestPlayer(player);
             if (nearestPlayer != null) {
@@ -77,5 +77,10 @@ public class Events implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Circle.getInstance().spawnArmorStand(event.getPlayer().getEyeLocation());
     }
 }
