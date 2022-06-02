@@ -2,6 +2,7 @@ package gg.matthew;
 
 import gg.matthew.commands.manage.Start;
 import gg.matthew.commands.manage.Stop;
+import gg.matthew.core.particle.Particle;
 import gg.matthew.event.Events;
 import gg.overcast.api.command.CommandManager;
 import org.bukkit.Bukkit;
@@ -39,5 +40,6 @@ public final class Main extends JavaPlugin {
         } catch (NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
         }
+        Particle.getInstance().cacheWinnerEffect();
     }
 }

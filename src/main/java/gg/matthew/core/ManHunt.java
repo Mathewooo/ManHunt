@@ -2,15 +2,11 @@ package gg.matthew.core;
 
 import gg.matthew.Main;
 import gg.matthew.core.nametags.NameTags;
-import gg.matthew.core.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -76,7 +72,6 @@ public class ManHunt {
             Bukkit.getPlayer(uuid).getInventory().clear();
         }
         createCompasses();
-        settingLodestone();
         NameTags.getInstance().setNameTags();
         NameTags.getInstance().newTags();
         setGlowing();
@@ -129,26 +124,12 @@ public class ManHunt {
                 huntersCompasses.put(uuid, Bukkit.getPlayer(uuid).getInventory().getItemInOffHand());
         }
     }
-    
-    //TODO try to make It so you won't use repeated task but make It somehow so It only updates desired Compass on when nearest runner moves (an event)
-    //FIX lodestone glitching in end and nether
-    private void settingLodestone() {
-        //TODO make check for the change in worlds
-        task = Bukkit.getScheduler().runTaskTimerAsynchronously(Main.getInstance(), () -> {
-            for (Map.Entry<UUID, ItemStack> entry : huntersCompasses.entrySet()) {
-                if (Bukkit.getPlayer(entry.getKey()) != null) {
-                    Player nearestPlayer = Utils.getNearestPlayer(Bukkit.getPlayer(entry.getKey()));
-                    if (nearestPlayer != null)
-                        Bukkit.getPlayer(entry.getKey()).setCompassTarget(nearestPlayer.getLocation());
-                    ItemMeta itemMeta = entry.getValue().getItemMeta();
-                    itemMeta.setLore(Collections.singletonList(nearestPlayer != null ? ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + nearestPlayer.getName() : ChatColor.WHITE + "Players went to different dimension"));
-                    entry.getValue().setItemMeta(itemMeta);
-                }
-            }
-        }, 0, 4);
+
+    public Map<UUID, ItemStack> getHuntersCompasses() {
+        return Collections.unmodifiableMap(huntersCompasses);
     }
 
-    //At some point implement configurable feature where only runners can see the glowing hunters not hunters seeing glowing hunter (can be done through nms) (implement in version 1.1)
+    //TODO At some point implement configurable feature where only runners can see the glowing hunters not hunters seeing glowing hunter (can be done through nms) (implement in version 1.1)
     private void setGlowing() {
         for (UUID uuid : hunters) {
             Bukkit.getPlayer(uuid).setGlowing(true);

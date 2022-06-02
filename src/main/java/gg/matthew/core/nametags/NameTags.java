@@ -26,7 +26,6 @@ public class NameTags {
     public void createNameTags(List<UUID> map, String teamName) {
         for (UUID uuid : map) {
             Player player = Bukkit.getPlayer(uuid);
-            Bukkit.getLogger().severe(player.getName());
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
             for (Teams team : Teams.values()) {
                 Team scoreboardTeam = player.getScoreboard().registerNewTeam(team.getTeamName());
