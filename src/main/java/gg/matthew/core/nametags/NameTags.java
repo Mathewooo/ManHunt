@@ -62,4 +62,15 @@ public class NameTags {
             }
         }
     }
+
+    public void removeTag(UUID uuid) {
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            Team team = target.getScoreboard().getEntryTeam(Bukkit.getPlayer(uuid).getName());
+            if (team == null) {
+                Bukkit.getLogger().severe("Error: " + "team was not found! (Please contact developer)");
+                return;
+            }
+            team.removeEntry(Bukkit.getPlayer(uuid).getName());
+        }
+    }
 }

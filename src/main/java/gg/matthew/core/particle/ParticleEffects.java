@@ -17,8 +17,8 @@ public class ParticleEffects {
         return instance;
     }
 
-    public void spawnWinnerEffect(Location location) {
-        runSphereEffect(location);
+    public void spawnWinnerEffect(Location location, Particle.DustOptions dustOptions) {
+        runSphereEffect(location, dustOptions);
         runHexagonEffect(location);
     }
 
@@ -41,8 +41,7 @@ public class ParticleEffects {
         }
     }
 
-    private void runSphereEffect(Location location) {
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1.0F);
+    private void runSphereEffect(Location location, Particle.DustOptions dustOptions) {
         for (double[] array : sphereCoordinates) {
             double[] coords = new double[]{};
             for (double coord : array) {

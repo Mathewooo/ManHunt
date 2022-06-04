@@ -2,17 +2,18 @@ package gg.matthew.core;
 
 import gg.matthew.Main;
 import gg.matthew.core.nametags.NameTags;
+import gg.matthew.core.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-
-//MAKE WHOLE CLASS much cleaner and simpler
 
 public class ManHunt {
     private static ManHunt instance;
@@ -53,6 +54,14 @@ public class ManHunt {
         for (String hunter : players) {
             hunters.add(Bukkit.getPlayer(hunter).getUniqueId());
         }
+    }
+
+    public void removeRunner(UUID uuid) {
+        runners.remove(uuid);
+    }
+
+    public void removeHunter(UUID uuid) {
+        hunters.remove(uuid);
     }
 
     public List<UUID> getRunners() {
@@ -99,17 +108,18 @@ public class ManHunt {
     private void removeCompasses() {
         for (UUID uuid : hunters) {
             boolean shouldContinue = true;
-            for (ItemStack itemStack : Bukkit.getPlayer(uuid).getInventory().getContents()) {
+            Player player = Bukkit.getPlayer(uuid);
+            for (ItemStack itemStack : player.getInventory().getContents()) {
                 if (itemStack != null && Objects.equals(itemStack.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
-                    Bukkit.getPlayer(uuid).getInventory().remove(itemStack);
+                    player.getInventory().remove(itemStack);
                     shouldContinue = false;
                     break;
                 }
             }
-            //DOESN't WORK
-            if (shouldContinue && Bukkit.getPlayer(uuid).getInventory().getItemInOffHand() != null)
-                if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
-                    Bukkit.getPlayer(uuid).getInventory().setItemInOffHand(null);
+            //FIX THIS!!
+            if (shouldContinue && player.getInventory().getItemInOffHand() != null)
+                if (Objects.equals(player.getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
+                    player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
         }
     }
 
@@ -117,8 +127,11 @@ public class ManHunt {
         ItemStack compass = new ItemStack(Material.COMPASS);
         CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
         compassMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, "tracker");
-        compass.setItemMeta(compassMeta);
         for (UUID uuid : hunters) {
+            Player nearestPlayer = Utils.getNearestPlayer(Bukkit.getPlayer(uuid));
+            if (nearestPlayer != null)
+                compassMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + nearestPlayer.getName()));
+            compass.setItemMeta(compassMeta);
             Bukkit.getPlayer(uuid).getInventory().setItemInOffHand(compass);
             if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
                 huntersCompasses.put(uuid, Bukkit.getPlayer(uuid).getInventory().getItemInOffHand());

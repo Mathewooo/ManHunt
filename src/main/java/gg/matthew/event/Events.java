@@ -1,6 +1,7 @@
 package gg.matthew.event;
 
 import gg.matthew.core.ManHunt;
+import gg.matthew.core.nametags.NameTags;
 import gg.matthew.core.particle.armorstand.Circle;
 import gg.matthew.core.utils.Utils;
 import org.bukkit.*;
@@ -10,9 +11,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -40,18 +41,44 @@ public class Events implements Listener {
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        //TODO check world too
         EntityType entity = event.getEntity().getType();
         Player killer = event.getEntity().getKiller();
-        if (ManHunt.getInstance().hasGameStarted() && entity == EntityType.ENDER_DRAGON)
+        if (ManHunt.getInstance().hasGameStarted() && entity.equals(EntityType.ENDER_DRAGON))
             if (event.getEntity().getWorld().getEnvironment().equals(World.Environment.THE_END))
-                if (ManHunt.getInstance().getRunners().contains(killer.getUniqueId())) {
-                    //TODO end the game and make particle effects(spiral or sth. like that) for the runner that won
-                    Bukkit.broadcastMessage(event.getEntity().getKiller().getName() + " Won as runner!");
-                } else if (ManHunt.getInstance().getHunters().contains(killer.getUniqueId())) {
-                    Bukkit.broadcastMessage(event.getEntity().getKiller().getName() + " Won as hunter!");
-                    //TODO end the game and make sad particle effects for the runners and send titles that hunters won
-                }
+                if (ManHunt.getInstance().getRunners().contains(killer.getUniqueId())) endGame(killer, "runners");
+
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity().getPlayer();
+        Player killer = event.getEntity().getKiller();
+        if (ManHunt.getInstance().hasGameStarted())
+            if (ManHunt.getInstance().getRunners().contains(player.getUniqueId())) {
+                NameTags.getInstance().removeTag(player.getUniqueId());
+                ManHunt.getInstance().removeRunner(player.getUniqueId());
+                if (ManHunt.getInstance().getRunners().isEmpty()) endGame(killer, "hunters");
+            }
+    }
+
+    private void endGame(Player killer, String type) {
+        switch (type) {
+            case "runners" -> {
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 120, 255), 1.0F);
+                Circle.getInstance().winnerEffect(killer, dustOptions);
+                Utils.sendTitles(ManHunt.getInstance().getRunners(), ChatColor.BLUE + "You've won!", "Runner " + killer + " killed dragon!", true, killer.getUniqueId());
+                Utils.sendTitles(ManHunt.getInstance().getHunters(), ChatColor.RED + "You've lost!", "", false, null);
+                Bukkit.broadcastMessage(ChatColor.BOLD.toString() + ChatColor.GRAY + killer.getName() + ChatColor.RESET + " Won as runner!");
+            }
+            case "hunters" -> {
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 120, 0), 1.0F);
+                Circle.getInstance().winnerEffect(killer, dustOptions);
+                Utils.sendTitles(ManHunt.getInstance().getHunters(), ChatColor.BLUE + "You've won!", "Hunter " + killer + " killed last runner!", true, killer.getUniqueId());
+                Utils.sendTitles(ManHunt.getInstance().getRunners(), ChatColor.RED + "You've lost!", "", false, null);
+                Bukkit.broadcastMessage(ChatColor.BOLD.toString() + ChatColor.GRAY + killer.getName() + ChatColor.RESET + " Won as hunter!");
+            }
+        }
+        ManHunt.getInstance().cancelCurrentGame();
     }
 
     //TODO fix the things when you can put compass to chest or dispensers
@@ -59,7 +86,7 @@ public class Events implements Listener {
     //CHECK THIS IF IT WORKS!!
     //FIX lodestone glitching in end and nether
     @EventHandler(priority = EventPriority.HIGH)
-    public void onMove(PlayerMoveEvent event) {
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (ManHunt.getInstance().hasGameStarted() && ManHunt.getInstance().getRunners().contains(player.getUniqueId())) {
             Player nearestPlayer = Utils.getNearestPlayer(player);
@@ -77,10 +104,5 @@ public class Events implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        Circle.getInstance().spawnArmorStand(event.getPlayer().getEyeLocation());
     }
 }
