@@ -124,7 +124,8 @@ public class ManHunt {
                     player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
         }
     }
-
+    
+    //TODO lore doesn't work
     private void createCompasses() {
         ItemStack compass = new ItemStack(Material.COMPASS);
         CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
