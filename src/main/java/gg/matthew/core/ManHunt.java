@@ -1,8 +1,9 @@
 package gg.matthew.core;
 
 import gg.matthew.Main;
-import gg.matthew.core.players.model.Hunter;
 import gg.matthew.core.nametags.NameTags;
+import gg.matthew.core.players.model.Hunter;
+import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -83,6 +84,7 @@ public class ManHunt {
         NameTags.getInstance().setNameTags();
         NameTags.getInstance().newTags();
         setGlowing();
+        ScoreBoards.getInstance().createScoreBoards();
         merged.clear();
     }
 
@@ -90,6 +92,7 @@ public class ManHunt {
         setMerged();
         NameTags.getInstance().removeTags();
         disableGlowing();
+        ScoreBoards.getInstance().removeScoreBoards();
         merged.clear();
         removeCompasses();
         hunters.clear();
