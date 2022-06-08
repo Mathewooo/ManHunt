@@ -1,9 +1,9 @@
 package gg.matthew.core.particle;
 
 import gg.matthew.core.utils.Utils;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+
 import java.util.Vector;
 
 public class ParticleEffects {
@@ -44,9 +44,8 @@ public class ParticleEffects {
     private void runSphereEffect(Location location, Particle.DustOptions dustOptions) {
         for (double[] array : sphereCoordinates) {
             double[] coords = new double[]{};
-            for (double coord : array) {
+            for (double coord : array)
                 coords = Utils.addElement(coords, coord);
-            }
             location.add(coords[0], coords[1], coords[2]);
             location.getWorld().spawnParticle(Particle.REDSTONE, location, 0, dustOptions);
             location.subtract(coords[0], coords[1], coords[2]);
@@ -68,9 +67,8 @@ public class ParticleEffects {
     private void runHexagonEffect(Location location) {
         for (double[] array : hexagonCoordinates) {
             double[] coords = new double[]{};
-            for (double coord : array) {
+            for (double coord : array)
                 coords = Utils.addElement(coords, coord);
-            }
             location.add(coords[0], 0, coords[1]);
             location.getWorld().spawnParticle(Particle.GLOW, location, 0, 0, 0, 0, 0);
             location.subtract(coords[0], 0, coords[1]);

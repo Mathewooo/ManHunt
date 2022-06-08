@@ -1,6 +1,7 @@
 package gg.matthew.core;
 
 import gg.matthew.Main;
+import gg.matthew.core.players.model.Hunter;
 import gg.matthew.core.nametags.NameTags;
 import gg.matthew.core.utils.Utils;
 import org.bukkit.Bukkit;
@@ -17,7 +18,7 @@ import java.util.*;
 
 public class ManHunt {
     private static ManHunt instance;
-    private final Vector<UUID> hunters = new Vector<>();
+    private final Vector<Hunter> hunters = new Vector<>();
     private final Vector<UUID> runners = new Vector<>();
     private final LinkedHashMap<UUID, ItemStack> huntersCompasses = new LinkedHashMap<>();
     private final Vector<UUID> merged = new Vector<>();
@@ -46,14 +47,12 @@ public class ManHunt {
         gameStarted = false;
     }
 
-    public List<UUID> getHunters() {
+    public List<Hunter> getHunters() {
         return Collections.unmodifiableList(hunters);
     }
 
-    public void setHunters(List<String> players) {
-        for (String hunter : players) {
-            hunters.add(Bukkit.getPlayer(hunter).getUniqueId());
-        }
+    public void setHunters(List<Hunter> players) {
+        hunters.addAll(players);
     }
 
     public void removeRunner(UUID uuid) {
@@ -61,7 +60,9 @@ public class ManHunt {
     }
 
     public void removeHunter(UUID uuid) {
-        hunters.remove(uuid);
+        hunters.forEach(hunter -> {
+            if (hunter.getPlayerId().equals(uuid)) hunters.remove(hunter);
+        });
     }
 
     public List<UUID> getRunners() {
@@ -69,9 +70,7 @@ public class ManHunt {
     }
 
     public void setRunners(List<String> players) {
-        for (String runner : players) {
-            runners.add(Bukkit.getPlayer(runner).getUniqueId());
-        }
+        players.forEach(runner -> runners.add(Bukkit.getPlayer(runner).getUniqueId()));
     }
 
     public void startGame() {
@@ -106,16 +105,16 @@ public class ManHunt {
     }
 
     private void removeCompasses() {
-        for (UUID uuid : hunters) {
-            boolean shouldContinue = true;
+        for (UUID uuid : returnFilteredHunters()) {
             Player player = Bukkit.getPlayer(uuid);
-            for (ItemStack itemStack : player.getInventory().getContents()) {
-                if (itemStack != null && Objects.equals(itemStack.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
-                    player.getInventory().remove(itemStack);
-                    shouldContinue = false;
-                    break;
-                }
-            }
+            boolean shouldContinue = true;
+            for (ItemStack itemStack : player.getInventory().getContents())
+                if (itemStack != null)
+                    if (Objects.equals(itemStack.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
+                        player.getInventory().remove(itemStack);
+                        shouldContinue = false;
+                        break;
+                    }
             //FIX THIS!!
             if (shouldContinue && player.getInventory().getItemInOffHand() != null)
                 if (Objects.equals(player.getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
@@ -127,7 +126,7 @@ public class ManHunt {
         ItemStack compass = new ItemStack(Material.COMPASS);
         CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
         compassMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, "tracker");
-        for (UUID uuid : hunters) {
+        for (UUID uuid : returnFilteredHunters()) {
             Player nearestPlayer = Utils.getNearestPlayer(Bukkit.getPlayer(uuid));
             if (nearestPlayer != null)
                 compassMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + nearestPlayer.getName()));
@@ -144,15 +143,19 @@ public class ManHunt {
 
     //TODO At some point implement configurable feature where only runners can see the glowing hunters not hunters seeing glowing hunter (can be done through nms) (implement in version 1.1)
     private void setGlowing() {
-        for (UUID uuid : hunters) {
+        for (UUID uuid : returnFilteredHunters())
             Bukkit.getPlayer(uuid).setGlowing(true);
-        }
     }
 
     private void disableGlowing() {
-        for (UUID uuid : hunters) {
+        for (UUID uuid : returnFilteredHunters())
             Bukkit.getPlayer(uuid).setGlowing(false);
-        }
+    }
+
+    public List<UUID> returnFilteredHunters() {
+        List<UUID> hunters = new ArrayList<>();
+        ManHunt.getInstance().getHunters().forEach(hunter -> hunters.add(hunter.getPlayerId()));
+        return Collections.unmodifiableList(hunters);
     }
 
     public Vector<UUID> getMerged() {
@@ -160,7 +163,18 @@ public class ManHunt {
     }
 
     private void setMerged() {
-        merged.addAll(hunters);
+        merged.addAll(returnFilteredHunters());
         merged.addAll(runners);
+    }
+
+    public Hunter returnHunterObject(UUID uuid) {
+        var ref = new Object() {
+            Hunter hunter;
+        };
+        hunters.forEach(hunter -> {
+            if (hunter.getPlayerId().equals(uuid)) ref.hunter = hunter;
+        });
+        if (ref.hunter != null) return ref.hunter;
+        return null;
     }
 }

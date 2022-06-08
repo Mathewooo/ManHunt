@@ -10,21 +10,18 @@ import java.util.UUID;
 
 public class Utils {
     public static Player isPlayerOnline(String name) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : Bukkit.getOnlinePlayers())
             if (player.getName().equals(name)) return player;
-        }
         return null;
     }
 
     public static Player getNearestPlayer(Player checkNear) {
         Player nearest = null;
         for (Player player : checkNear.getWorld().getPlayers()) {
-            if (player != checkNear) if (ManHunt.getInstance().getHunters().contains(player.getUniqueId())) {
+            if (player != checkNear) if (ManHunt.getInstance().returnFilteredHunters().contains(player.getUniqueId()))
                 if (nearest == null) nearest = player;
                 else if (player.getLocation().distance(checkNear.getLocation()) < nearest.getLocation().distance(checkNear.getLocation()))
                     nearest = player;
-            }
-
         }
         return nearest;
     }
@@ -38,7 +35,7 @@ public class Utils {
     }
 
     public static void sendTitles(List<UUID> list, String title, String subtitle, boolean except, UUID exceptPlayer) {
-        for (UUID uuid : list) {
+        for (UUID uuid : list)
             if (except && exceptPlayer != null) {
                 if (uuid != exceptPlayer) {
                     sendTitle(uuid, title, subtitle);
@@ -48,10 +45,9 @@ public class Utils {
             } else {
                 sendTitle(uuid, title, subtitle);
             }
-        }
     }
 
     public static void sendTitle(UUID uuid, String title, String subtitle) {
-        Bukkit.getPlayer(uuid).sendTitle(title, subtitle, 20, 30, 20);
+        Bukkit.getPlayer(uuid).sendTitle(title, subtitle, 15, 40, 15);
     }
 }

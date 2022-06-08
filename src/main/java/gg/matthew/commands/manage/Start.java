@@ -1,6 +1,7 @@
 package gg.matthew.commands.manage;
 
 import gg.matthew.core.ManHunt;
+import gg.matthew.core.players.model.Hunter;
 import gg.matthew.core.utils.Utils;
 import gg.overcast.api.command.SubCommand;
 import org.bukkit.Bukkit;
@@ -31,7 +32,8 @@ public class Start extends SubCommand {
         return "/manhunt start (player) (player) ...";
     }
 
-    //Cancel that you can choose all players from server as runners
+    //TODO Cancel that you can choose all players from server as runners or hunters
+    //TODO Refactor this command in a way that you can choose both hunter and runners how you want and others on server won't be interfered in the game
     @Override
     public void perform(CommandSender sender, String[] args) {
         if (args.length >= 2) {
@@ -43,18 +45,18 @@ public class Start extends SubCommand {
                         if (!argsPlayers.contains(argsPlayer) && !Objects.equals(argsPlayer, getName()))
                             argsPlayers.add(argsPlayer);
                     });
-                    for (String player : argsPlayers) {
+                    for (String player : argsPlayers)
                         if (Utils.isPlayerOnline(player) == null) {
                             canContinue = false;
                             sender.sendMessage(ChatColor.RED + (argsPlayers.size() == 1 ? "Entered player isn't online!" : "One of the players entered isn't online!"));
                             break;
                         }
-                    }
                     if (canContinue) {
-                        List<String> hunters = new ArrayList<>();
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (!argsPlayers.contains(player.getName())) hunters.add(player.getName());
-                        }
+                        Hunter.Builder hunterBuilder = new Hunter.Builder();
+                        List<Hunter> hunters = new ArrayList<>();
+                        for (Player player : Bukkit.getOnlinePlayers())
+                            if (!argsPlayers.contains(player.getName()))
+                                hunters.add(hunterBuilder.setPlayerId(player.getUniqueId()).setLives(4).build());
                         ManHunt.getInstance().setGameStarted();
                         ManHunt.getInstance().setRunners(argsPlayers);
                         ManHunt.getInstance().setHunters(hunters);
@@ -75,9 +77,8 @@ public class Start extends SubCommand {
     @Override
     public List<String> getSubcommandArguments(Player player, String[] args) {
         Vector<String> onlinePlayers = new Vector<>();
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers())
             onlinePlayers.add(onlinePlayer.getName());
-        }
         return onlinePlayers;
     }
 }

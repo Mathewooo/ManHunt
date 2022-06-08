@@ -41,8 +41,6 @@ public class Circle {
         return stand;
     }
 
-    //TODO handle quit event of the player (or just pass argument of the player and check if is online)
-    //TODO also on the cancel don't forget to remove the armorstand
     public void winnerEffect(Player player, Particle.DustOptions dustOptions) {
         Location location = player.getEyeLocation();
         ArmorStand stand = generateArmorStand(location);

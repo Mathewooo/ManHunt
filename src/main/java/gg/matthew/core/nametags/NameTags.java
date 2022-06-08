@@ -19,7 +19,7 @@ public class NameTags {
     }
 
     public void setNameTags() {
-        createNameTags(ManHunt.getInstance().getHunters(), Teams.HUNTER.getTeamName());
+        createNameTags(ManHunt.getInstance().returnFilteredHunters(), Teams.HUNTER.getTeamName());
         createNameTags(ManHunt.getInstance().getRunners(), Teams.RUNNER.getTeamName());
     }
 
@@ -32,45 +32,48 @@ public class NameTags {
                 if (!team.getTeamName().equals(Teams.RUNNER.getTeamName())) scoreboardTeam.setColor(ChatColor.WHITE);
                 scoreboardTeam.setPrefix(team.getPrefix() + ChatColor.RESET);
             }
-            for (Player target : Bukkit.getOnlinePlayers()) {
+            for (Player target : Bukkit.getOnlinePlayers())
                 if (player.getUniqueId() != target.getUniqueId())
                     player.getScoreboard().getTeam(teamName).addEntry(target.getName());
-            }
         }
     }
 
     public void newTags() {
-        for (UUID uuid : ManHunt.getInstance().getMerged()) {
-            for (Player target : Bukkit.getOnlinePlayers()) {
-                if (ManHunt.getInstance().getHunters().contains(uuid))
+        for (UUID uuid : ManHunt.getInstance().getMerged())
+            for (Player target : Bukkit.getOnlinePlayers())
+                if (ManHunt.getInstance().returnFilteredHunters().contains(uuid))
                     target.getScoreboard().getTeam(Teams.HUNTER.getTeamName()).addEntry(Bukkit.getPlayer(uuid).getName());
                 else
                     target.getScoreboard().getTeam(Teams.RUNNER.getTeamName()).addEntry(Bukkit.getPlayer(uuid).getName());
-            }
-        }
     }
 
     public void removeTags() {
         for (UUID uuid : ManHunt.getInstance().getMerged()) {
+            Player player = Bukkit.getPlayer(uuid);
             for (Player target : Bukkit.getOnlinePlayers()) {
-                Team team = target.getScoreboard().getEntryTeam(Bukkit.getPlayer(uuid).getName());
+                Team team = target.getScoreboard().getEntryTeam(player.getName());
                 if (team == null) {
-                    Bukkit.getLogger().severe("Error: " + "team was not found! (Please contact developer)");
+                    teamNullError();
                     return;
                 }
-                team.removeEntry(Bukkit.getPlayer(uuid).getName());
+                team.removeEntry(player.getName());
             }
         }
     }
 
     public void removeTag(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
         for (Player target : Bukkit.getOnlinePlayers()) {
-            Team team = target.getScoreboard().getEntryTeam(Bukkit.getPlayer(uuid).getName());
+            Team team = target.getScoreboard().getEntryTeam(player.getName());
             if (team == null) {
-                Bukkit.getLogger().severe("Error: " + "team was not found! (Please contact developer)");
+                teamNullError();
                 return;
             }
-            team.removeEntry(Bukkit.getPlayer(uuid).getName());
+            team.removeEntry(player.getName());
         }
+    }
+
+    private void teamNullError() {
+        Bukkit.getLogger().severe("Error: " + "team was not found! (Please contact developer)");
     }
 }

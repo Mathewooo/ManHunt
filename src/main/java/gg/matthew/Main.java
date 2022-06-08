@@ -15,6 +15,8 @@ public final class Main extends JavaPlugin {
     //TODO implement permissions for stop and start command
     //TODO implement game freezer for configurable amount of time when one of the runnners quits
     //TODO implement config
+    //TODO implement worlds resetting
+    //TODO implement countdown before before game starts at least 20 seconds default
 
     private static Main instance;
 
