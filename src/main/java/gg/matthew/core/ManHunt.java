@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 
 public class ManHunt {
+    //TODO cache hunters position when they die and if they still have lives left after subtracting one and then when they'll respawn teleport them to the location
     private static ManHunt instance;
     private final Vector<Hunter> hunters = new Vector<>();
     private final Vector<UUID> runners = new Vector<>();
