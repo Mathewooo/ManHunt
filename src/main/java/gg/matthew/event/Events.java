@@ -106,6 +106,7 @@ public class Events implements Listener {
 
     //CHECK THIS IF IT WORKS!!
     //FIX lodestone glitching in end and nether
+    //TODO lore doesn't work
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();

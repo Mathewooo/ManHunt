@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+//TODO !!!!fix all of the errors with the help of the lectures (lectures: 60,61)
 public class ScoreBoards {
+    //!!! Scoreboards don't update and these are the problems: hunter's view(https://gyazo.com/abad3c76bb79ae3a1aa9ffd01042107a); runner's view(https://gyazo.com/35573a71d22c470fc65b968af6dc0f29)
     private static ScoreBoards instance;
     Map<String, Scoreboard> scoreboards = new HashMap<>();
     String displayName = ChatColor.UNDERLINE.toString() + ChatColor.BOLD + "Manhunt Game";
@@ -51,12 +53,12 @@ public class ScoreBoards {
 
     private void generateState(Scoreboard board, Objective objective, String team, boolean hunters) { // state "\\lives and etc. or if player is dead"
         if (hunters) for (Hunter hunter : ManHunt.getInstance().getHunters()) {
-            setPrefixes(objective, returnTeam(board, team, hunter.getPlayerId()), "hunters", Bukkit.getPlayer(hunter.getPlayerId()).getName() + " " + ChatColor.GRAY + ChatColor.UNDERLINE + hunter.getLives());
+            setPrefixes(objective, returnTeam(board, team, hunter.getPlayerId()), "hunters", Bukkit.getPlayer(hunter.getPlayerId()).getName() + " " + ChatColor.GRAY + hunter.getLives());
             Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
             scoreIndex--;
         }
         else for (UUID uuid : ManHunt.getInstance().getRunners()) {
-            setPrefixes(objective, returnTeam(board, team, uuid), "runners", ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getName() + ChatColor.GRAY + ChatColor.UNDERLINE + " Alive");
+            setPrefixes(objective, returnTeam(board, team, uuid), "runners", ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getName() + ChatColor.GRAY + " Alive");
             Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
             scoreIndex--;
         }
@@ -114,9 +116,9 @@ public class ScoreBoards {
         for (Map.Entry<String, Scoreboard> scoreboard : scoreboards.entrySet()) {
             if (ManHunt.getInstance().returnFilteredHunters().contains(uuid)) {
                 int lives = ManHunt.getInstance().returnHunterObject(uuid).getLives();
-                setPrefix(scoreboard.getValue().getTeam("hunters" + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(ManHunt.getInstance().returnHunterObject(uuid).getPlayerId()) + " " + ChatColor.GRAY + ChatColor.UNDERLINE + (lives == 0 ? "Dead" : lives));
+                setPrefix(scoreboard.getValue().getTeam("hunters" + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(ManHunt.getInstance().returnHunterObject(uuid).getPlayerId()) + " " + ChatColor.GRAY + (lives == 0 ? "Dead" : lives));
             } else if (ManHunt.getInstance().getRunners().contains(uuid))
-                setPrefix(scoreboard.getValue().getTeam("runners" + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(uuid) + " " + ChatColor.GRAY + ChatColor.UNDERLINE + "Dead");
+                setPrefix(scoreboard.getValue().getTeam("runners" + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(uuid) + " " + ChatColor.GRAY + "Dead");
         }
     }
 }
