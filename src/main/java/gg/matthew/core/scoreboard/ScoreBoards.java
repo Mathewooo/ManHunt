@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,6 +21,8 @@ public class ScoreBoards {
     int scoreIndex;
     boolean[] booleans = new boolean[]{true, false};
     Map<String, ChatColor> teamTypes = new HashMap<>();
+
+    String splitter = ":";
 
     public static synchronized ScoreBoards getInstance() {
         if (instance == null) instance = new ScoreBoards();
@@ -53,20 +56,20 @@ public class ScoreBoards {
 
     private void generateState(Scoreboard board, Objective objective, String team, boolean hunters) { // state "\\lives and etc. or if player is dead"
         if (hunters) for (Hunter hunter : ManHunt.getInstance().getHunters()) {
-            setPrefixes(objective, returnTeam(board, team, hunter.getPlayerId()), "hunters", Bukkit.getPlayer(hunter.getPlayerId()).getName() + " " + ChatColor.GRAY + hunter.getLives());
+            setPrefixes(objective, returnTeam(board, team, hunter.getPlayerId()), team + hunter.getPlayerId(), Bukkit.getPlayer(hunter.getPlayerId()).getName() + " " + ChatColor.GRAY + hunter.getLives());
             Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
             scoreIndex--;
         }
         else for (UUID uuid : ManHunt.getInstance().getRunners()) {
-            setPrefixes(objective, returnTeam(board, team, uuid), "runners", ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getName() + ChatColor.GRAY + " Alive");
+            setPrefixes(objective, returnTeam(board, team, uuid), team + uuid, ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getName() + ChatColor.GRAY + " Alive");
             Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
             scoreIndex--;
         }
     }
 
     private void setPrefixes(Objective objective, Team team, String teamEntry, String prefix) {
+        setPrefix(team, prefix);
         objective.getScore(teamEntry).setScore(scoreIndex);
-        team.setPrefix(prefix);
     }
 
     private void setPrefix(Team team, String prefix) {
@@ -74,8 +77,8 @@ public class ScoreBoards {
     }
 
     private Team returnTeam(Scoreboard board, String team, UUID uuid) {
-        Team gameTeam = board.registerNewTeam(team + ":" + uuid);
-        gameTeam.addEntry(team);
+        Team gameTeam = board.registerNewTeam(team + splitter + uuid);
+        gameTeam.addEntry(team + uuid);
         return gameTeam;
     }
 
@@ -84,15 +87,18 @@ public class ScoreBoards {
         else Bukkit.getPlayer(uuid).setScoreboard(scoreboards.get("runners"));
     }
 
+    private void setUpdatedScoreboards(List<UUID> list, Scoreboard scoreboard) {
+        for (UUID uuid : list) {
+            Bukkit.getPlayer(uuid).setScoreboard(scoreboard);
+        }
+    }
+
     public void createScoreBoards() {
         teamTypes = initializeTypes();
         initializeBoards();
         ManHunt.getInstance().getMerged().forEach(player -> {
-            if (ManHunt.getInstance().returnFilteredHunters().contains(player)) {
-                setScoreboard(player, true);
-            } else if (ManHunt.getInstance().getRunners().contains(player)) {
-                setScoreboard(player, false);
-            }
+            if (ManHunt.getInstance().returnFilteredHunters().contains(player)) setScoreboard(player, true);
+            else if (ManHunt.getInstance().getRunners().contains(player)) setScoreboard(player, false);
         });
     }
 
@@ -114,11 +120,18 @@ public class ScoreBoards {
     public void updateScoreBoards(Player player) { // state "\\lives and etc. or if player is dead - left or freezed"
         UUID uuid = player.getUniqueId();
         for (Map.Entry<String, Scoreboard> scoreboard : scoreboards.entrySet()) {
-            if (ManHunt.getInstance().returnFilteredHunters().contains(uuid)) {
-                int lives = ManHunt.getInstance().returnHunterObject(uuid).getLives();
-                setPrefix(scoreboard.getValue().getTeam("hunters" + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(ManHunt.getInstance().returnHunterObject(uuid).getPlayerId()) + " " + ChatColor.GRAY + (lives == 0 ? "Dead" : lives));
-            } else if (ManHunt.getInstance().getRunners().contains(uuid))
-                setPrefix(scoreboard.getValue().getTeam("runners" + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(uuid) + " " + ChatColor.GRAY + "Dead");
+            updateStates(uuid, scoreboard.getValue());
+        }
+    }
+
+    private void updateStates(UUID uuid, Scoreboard scoreboard) {
+        if (ManHunt.getInstance().returnFilteredHunters().contains(uuid)) {
+            int lives = ManHunt.getInstance().returnHunterObject(uuid).getLives();
+            setPrefix(scoreboard.getTeam("hunters" + splitter + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(ManHunt.getInstance().returnHunterObject(uuid).getPlayerId()) + " " + ChatColor.GRAY + (lives == 0 ? "Dead" : lives));
+            setUpdatedScoreboards(ManHunt.getInstance().returnFilteredHunters(), scoreboard);
+        } else if (ManHunt.getInstance().getRunners().contains(uuid)) {
+            setPrefix(scoreboard.getTeam("runners" + splitter + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(uuid) + " " + ChatColor.GRAY + "Dead");
+            setUpdatedScoreboards(ManHunt.getInstance().getRunners(), scoreboard);
         }
     }
 }
