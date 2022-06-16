@@ -5,6 +5,7 @@ import gg.matthew.core.nametags.NameTags;
 import gg.matthew.core.players.model.Hunter;
 import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
+import gg.matthew.event.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -76,11 +77,9 @@ public class ManHunt {
     }
 
     public void startGame() {
+        Events.getInstance().registerEvents();
         setMerged();
-        for (UUID uuid : merged) {
-            Bukkit.getPlayer(uuid).closeInventory();
-            Bukkit.getPlayer(uuid).getInventory().clear();
-        }
+        closeInventories();
         createCompasses();
         NameTags.getInstance().setNameTags();
         NameTags.getInstance().newTags();
@@ -90,6 +89,7 @@ public class ManHunt {
     }
 
     public void cancelCurrentGame() {
+        Events.getInstance().unRegisterEvents();
         setMerged();
         NameTags.getInstance().removeTags();
         disableGlowing();
@@ -99,6 +99,13 @@ public class ManHunt {
         hunters.clear();
         runners.clear();
         cancelTask();
+    }
+
+    private void closeInventories() {
+        for (UUID uuid : merged) {
+            Bukkit.getPlayer(uuid).closeInventory();
+            Bukkit.getPlayer(uuid).getInventory().clear();
+        }
     }
 
     private void cancelTask() {
@@ -125,7 +132,7 @@ public class ManHunt {
                     player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
         }
     }
-    
+
     //TODO lore doesn't work
     private void createCompasses() {
         ItemStack compass = new ItemStack(Material.COMPASS);

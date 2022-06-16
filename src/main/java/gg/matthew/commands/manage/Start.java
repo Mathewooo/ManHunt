@@ -48,7 +48,7 @@ public class Start extends SubCommand {
                     for (String player : argsPlayers)
                         if (Utils.isPlayerOnline(player) == null) {
                             canContinue = false;
-                            sender.sendMessage(ChatColor.RED + (argsPlayers.size() == 1 ? "Entered player isn't online!" : "One of the players entered isn't online!"));
+                            sender.sendMessage(ChatColor.RED + (argsPlayers.size() == 1 ? "Entered player isn't online!" : "One of the entered players isn't online!"));
                             break;
                         }
                     if (canContinue) {
