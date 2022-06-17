@@ -24,61 +24,24 @@ public class Start extends SubCommand {
 
     @Override
     public String getDescription() {
-        return "Starts ManHunt game with a runners desired from a command arguments";
+        return "Starts a ManHunt game";
     }
 
     @Override
     public String getSyntax() {
-        return "/manhunt start (player) (player) ...";
+        return "/manhunt start";
     }
 
-    //TODO Cancel that you can choose all players from server as runners or hunters
-    //TODO Refactor this command in a way that you can choose both hunter and runners how you want and others on server won't be interfered in the game
     @Override
     public void perform(CommandSender sender, String[] args) {
-        if (args.length >= 2) {
-            if (!(Bukkit.getOnlinePlayers().size() == 1)) {
-                if (!ManHunt.getInstance().hasGameStarted()) {
-                    boolean canContinue = true;
-                    List<String> argsPlayers = new ArrayList<>();
-                    Arrays.stream(args).forEach(argsPlayer -> {
-                        if (!argsPlayers.contains(argsPlayer) && !Objects.equals(argsPlayer, getName()))
-                            argsPlayers.add(argsPlayer);
-                    });
-                    for (String player : argsPlayers)
-                        if (Utils.isPlayerOnline(player) == null) {
-                            canContinue = false;
-                            sender.sendMessage(ChatColor.RED + (argsPlayers.size() == 1 ? "Entered player isn't online!" : "One of the entered players isn't online!"));
-                            break;
-                        }
-                    if (canContinue) {
-                        Hunter.Builder hunterBuilder = new Hunter.Builder();
-                        List<Hunter> hunters = new ArrayList<>();
-                        for (Player player : Bukkit.getOnlinePlayers())
-                            if (!argsPlayers.contains(player.getName()))
-                                hunters.add(hunterBuilder.setPlayerId(player.getUniqueId()).setLives(4).build());
-                        ManHunt.getInstance().setGameStarted();
-                        ManHunt.getInstance().setRunners(argsPlayers);
-                        ManHunt.getInstance().setHunters(hunters);
-                        ManHunt.getInstance().startGame();
-                        Bukkit.broadcastMessage(ChatColor.WHITE + "ManHunt" + ChatColor.GRAY + " game has started" + ChatColor.WHITE + "!");
-                    }
-                } else {
-                    sender.sendMessage(ChatColor.RED + "ManHunt game is currently running!");
-                }
-            } else {
-                sender.sendMessage(ChatColor.RED + "You cannot start a ManHunt game just with yourself!");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Please reference at least one player as runner to start game!");
-        }
+        //TODO make this done with the new system
+        ManHunt.getInstance().setGameStarted();
+        ManHunt.getInstance().startGame();
+        Bukkit.broadcastMessage(ChatColor.WHITE + "ManHunt" + ChatColor.GRAY + " game has started" + ChatColor.WHITE + "!");
     }
 
     @Override
     public List<String> getSubcommandArguments(Player player, String[] args) {
-        Vector<String> onlinePlayers = new Vector<>();
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-            onlinePlayers.add(onlinePlayer.getName());
-        return onlinePlayers;
+        return null;
     }
 }

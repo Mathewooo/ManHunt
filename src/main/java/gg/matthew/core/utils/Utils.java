@@ -1,12 +1,15 @@
 package gg.matthew.core.utils;
 
 import gg.matthew.core.ManHunt;
+import gg.matthew.core.players.PreGame;
+import gg.matthew.core.players.model.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.Vector;
 
 public class Utils {
     public static Player isPlayerOnline(String name) {
@@ -49,5 +52,23 @@ public class Utils {
 
     public static void sendTitle(UUID uuid, String title, String subtitle) {
         Bukkit.getPlayer(uuid).sendTitle(title, subtitle, 15, 40, 15);
+    }
+
+    public static List<String> returnTabCompletePlayers(UUID uuid, boolean hunters) {
+        Vector<String> onlinePlayers = new Vector<>();
+        Command preGameCommand = null;
+        if (PreGame.getInstance().hasPreGameCommand(uuid))
+            preGameCommand = PreGame.getInstance().returnPreGameCommand(uuid);
+        if (preGameCommand != null) {
+            if (hunters) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                    if (!preGameCommand.getRunners().contains(onlinePlayer.getUniqueId()))
+                        onlinePlayers.add(onlinePlayer.getName());
+            } else for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                if (!PreGame.getInstance().returnCommandFilteredHunters(preGameCommand).contains(onlinePlayer.getUniqueId()))
+                    onlinePlayers.add(onlinePlayer.getName());
+        } else for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+            onlinePlayers.add(onlinePlayer.getName());
+        return onlinePlayers;
     }
 }
