@@ -1,7 +1,7 @@
-package gg.matthew.core.players;
+package gg.matthew.core.players.pregame;
 
-import gg.matthew.core.players.model.Command;
-import gg.matthew.core.players.model.Hunter;
+import gg.matthew.core.players.pregame.model.Command;
+import gg.matthew.core.players.pregame.model.Hunter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -19,8 +19,6 @@ public class PreGame {
         return instance;
     }
 
-    //TODO implement update method when a player wants to declare hunters or runners again
-
     @SuppressWarnings("unchecked")
     public <Type> void createPreGame(UUID uuid, List<Type> list) {
         Command.Builder commandBuilder = new Command.Builder();
@@ -28,12 +26,11 @@ public class PreGame {
         for (Command command : preGameCommands)
             if (command.getPlayerId().equals(uuid)) if (list instanceof Hunter) command.setHunters((List<Hunter>) list);
             else command.setRunners((List<UUID>) list);
-
     }
 
     public void removePreGames(UUID uuid) {
         for (Command command : preGameCommands)
-            if (!command.getPlayerId().equals(uuid))
+            if (!command.getPlayerId().equals(uuid) && returnPreGameCommand(command.getPlayerId()) != null)
                 Bukkit.getPlayer(command.getPlayerId()).sendMessage(ChatColor.RED + "Your command storage for manhunt game was erased because game has started");
         preGameCommands.clear();
     }
@@ -58,9 +55,7 @@ public class PreGame {
 
     public boolean hasPreGameCommand(UUID uuid) {
         for (Command command : preGameCommands)
-            if (command.getPlayerId().equals(uuid)) {
-                return true;
-            }
+            if (command.getPlayerId().equals(uuid)) return true;
         return false;
     }
 

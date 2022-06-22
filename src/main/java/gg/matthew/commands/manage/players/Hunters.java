@@ -1,7 +1,7 @@
 package gg.matthew.commands.manage.players;
 
-import gg.matthew.core.players.PreGame;
-import gg.matthew.core.players.model.Hunter;
+import gg.matthew.core.players.pregame.PreGame;
+import gg.matthew.core.players.pregame.model.Hunter;
 import gg.matthew.core.utils.Utils;
 import gg.overcast.api.command.SubCommand;
 import org.bukkit.Bukkit;
@@ -57,9 +57,7 @@ public class Hunters extends SubCommand {
                     hunters.add(hunterBuilder.setPlayerId(Bukkit.getPlayer(player).getUniqueId()).setLives(4).build());
                 PreGame.getInstance().createPreGame(Bukkit.getPlayer(sender.getName()).getUniqueId(), hunters);
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Please reference at least one player as hunter!");
-        }
+        } else sender.sendMessage(ChatColor.RED + "Please reference at least one player as hunter!");
     }
 
     @Override

@@ -37,12 +37,8 @@ public class Stop extends SubCommand {
                 ManHunt.getInstance().setGameStopped();
                 ManHunt.getInstance().cancelCurrentGame();
                 Bukkit.broadcastMessage(ChatColor.RED + "ManHunt game has been stopped!");
-            } else {
-                sender.sendMessage(ChatColor.RED + "ManHunt game isn't running right now!");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Incorrect usage of command use: " + ChatColor.GRAY + getSyntax());
-        }
+            } else sender.sendMessage(ChatColor.RED + "ManHunt game isn't running right now!");
+        } else sender.sendMessage(ChatColor.RED + "Incorrect command usage: " + ChatColor.GRAY + getSyntax());
     }
 
     @Override

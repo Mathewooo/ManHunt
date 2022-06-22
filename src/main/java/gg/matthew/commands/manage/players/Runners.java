@@ -1,6 +1,6 @@
 package gg.matthew.commands.manage.players;
 
-import gg.matthew.core.players.PreGame;
+import gg.matthew.core.players.pregame.PreGame;
 import gg.matthew.core.utils.Utils;
 import gg.overcast.api.command.SubCommand;
 import org.bukkit.Bukkit;
@@ -51,9 +51,7 @@ public class Runners extends SubCommand {
                 }
             if (canContinue)
                 PreGame.getInstance().createPreGame(Bukkit.getPlayer(sender.getName()).getUniqueId(), argsPlayers);
-        } else {
-            sender.sendMessage(ChatColor.RED + "Please reference at least one player as runner!");
-        }
+        } else sender.sendMessage(ChatColor.RED + "Please reference at least one player as runner!");
     }
 
     @Override

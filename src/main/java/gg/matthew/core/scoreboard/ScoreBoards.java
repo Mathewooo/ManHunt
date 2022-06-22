@@ -1,7 +1,7 @@
 package gg.matthew.core.scoreboard;
 
 import gg.matthew.core.ManHunt;
-import gg.matthew.core.players.model.Hunter;
+import gg.matthew.core.players.pregame.model.Hunter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -88,9 +88,8 @@ public class ScoreBoards {
     }
 
     private void setUpdatedScoreboards(List<UUID> list, Scoreboard scoreboard) {
-        for (UUID uuid : list) {
+        for (UUID uuid : list)
             Bukkit.getPlayer(uuid).setScoreboard(scoreboard);
-        }
     }
 
     public void createScoreBoards() {

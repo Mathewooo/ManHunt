@@ -4,7 +4,7 @@ import gg.matthew.Main;
 import gg.matthew.core.ManHunt;
 import gg.matthew.core.nametags.NameTags;
 import gg.matthew.core.particle.armorstand.Circle;
-import gg.matthew.core.players.model.Hunter;
+import gg.matthew.core.players.pregame.model.Hunter;
 import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
 import org.bukkit.*;
@@ -130,14 +130,12 @@ public class Events implements Listener {
                 nearestPlayer.setCompassTarget(player.getLocation());
                 ItemMeta itemMeta = ManHunt.getInstance().getHuntersCompasses().get(nearestPlayer.getUniqueId()).getItemMeta();
                 itemMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + player.getName()));
-            } else {
-                for (Map.Entry<UUID, ItemStack> entry : ManHunt.getInstance().getHuntersCompasses().entrySet())
-                    if (Bukkit.getPlayer(entry.getKey()) != null) {
-                        ItemMeta itemMeta = entry.getValue().getItemMeta();
-                        itemMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Runners went to different dimension"));
-                        entry.getValue().setItemMeta(itemMeta);
-                    }
-            }
+            } else for (Map.Entry<UUID, ItemStack> entry : ManHunt.getInstance().getHuntersCompasses().entrySet())
+                if (Bukkit.getPlayer(entry.getKey()) != null) {
+                    ItemMeta itemMeta = entry.getValue().getItemMeta();
+                    itemMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Runners went to different dimension"));
+                    entry.getValue().setItemMeta(itemMeta);
+                }
         }
     }
 }

@@ -2,7 +2,7 @@ package gg.matthew.core;
 
 import gg.matthew.Main;
 import gg.matthew.core.nametags.NameTags;
-import gg.matthew.core.players.model.Hunter;
+import gg.matthew.core.players.pregame.model.Hunter;
 import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
 import gg.matthew.event.Events;

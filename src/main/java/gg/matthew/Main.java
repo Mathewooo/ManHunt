@@ -1,7 +1,10 @@
 package gg.matthew;
 
+import gg.matthew.commands.Reload;
 import gg.matthew.commands.manage.Start;
 import gg.matthew.commands.manage.Stop;
+import gg.matthew.commands.manage.players.Hunters;
+import gg.matthew.commands.manage.players.Runners;
 import gg.matthew.core.particle.ParticleEffects;
 import gg.matthew.event.Events;
 import gg.overcast.api.command.CommandManager;
@@ -38,7 +41,7 @@ public final class Main extends JavaPlugin {
                 sender.sendMessage("------------");
                 subCommandList.forEach(subCommand -> sender.sendMessage(ChatColor.GRAY + subCommand.getSyntax() + ChatColor.WHITE + " - " + ChatColor.BOLD + subCommand.getDescription()));
                 sender.sendMessage("------------");
-            }, Start.class, Stop.class);
+            }, Hunters.class, Runners.class, Start.class, Stop.class, Reload.class);
         } catch (NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
         }

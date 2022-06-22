@@ -1,4 +1,4 @@
-package gg.matthew.core.players.model;
+package gg.matthew.core.players.pregame.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

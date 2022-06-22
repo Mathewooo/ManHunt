@@ -1,8 +1,8 @@
 package gg.matthew.core.utils;
 
 import gg.matthew.core.ManHunt;
-import gg.matthew.core.players.PreGame;
-import gg.matthew.core.players.model.Command;
+import gg.matthew.core.players.pregame.PreGame;
+import gg.matthew.core.players.pregame.model.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -40,14 +40,9 @@ public class Utils {
     public static void sendTitles(List<UUID> list, String title, String subtitle, boolean except, UUID exceptPlayer) {
         for (UUID uuid : list)
             if (except && exceptPlayer != null) {
-                if (uuid != exceptPlayer) {
-                    sendTitle(uuid, title, subtitle);
-                } else {
-                    sendTitle(uuid, title, "");
-                }
-            } else {
-                sendTitle(uuid, title, subtitle);
-            }
+                if (uuid != exceptPlayer) sendTitle(uuid, title, subtitle);
+                else sendTitle(uuid, title, "");
+            } else sendTitle(uuid, title, subtitle);
     }
 
     public static void sendTitle(UUID uuid, String title, String subtitle) {
