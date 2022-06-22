@@ -35,7 +35,6 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         setInstance(this);
         saveDefaultConfig();
-        Bukkit.getPluginManager().registerEvents(new Events(), this);
         try {
             CommandManager.createCoreCommand(this, "manhunt", "All commands needed for manhunt game", "/manhunt", (sender, subCommandList) -> {
                 sender.sendMessage("------------");
