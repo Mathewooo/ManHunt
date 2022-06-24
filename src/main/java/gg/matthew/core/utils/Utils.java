@@ -1,8 +1,6 @@
 package gg.matthew.core.utils;
 
 import gg.matthew.core.ManHunt;
-import gg.matthew.core.players.pregame.PreGame;
-import gg.matthew.core.players.pregame.model.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -49,20 +47,9 @@ public class Utils {
         Bukkit.getPlayer(uuid).sendTitle(title, subtitle, 15, 40, 15);
     }
 
-    public static List<String> returnTabCompletePlayers(UUID uuid, boolean hunters) {
+    public static List<String> returnTabCompletePlayers() {
         Vector<String> onlinePlayers = new Vector<>();
-        Command preGameCommand = null;
-        if (PreGame.getInstance().hasPreGameCommand(uuid))
-            preGameCommand = PreGame.getInstance().returnPreGameCommand(uuid);
-        if (preGameCommand != null) {
-            if (hunters) {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                    if (!preGameCommand.getRunners().contains(onlinePlayer.getUniqueId()))
-                        onlinePlayers.add(onlinePlayer.getName());
-            } else for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                if (!PreGame.getInstance().returnCommandFilteredHunters(preGameCommand).contains(onlinePlayer.getUniqueId()))
-                    onlinePlayers.add(onlinePlayer.getName());
-        } else for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers())
             onlinePlayers.add(onlinePlayer.getName());
         return onlinePlayers;
     }

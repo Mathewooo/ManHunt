@@ -90,7 +90,7 @@ public class Events implements Listener {
                     ManHunt.getInstance().removeHunter(player.getUniqueId());
                     //TODO add the hunter as spectator if he wasn't the last remaining
                     if (ManHunt.getInstance().getHunters().isEmpty()) endGame(killer, "runners");
-                } // else if (hunterObject.getLives() == 1) {} //TODO implement an active effect for hunter if he has only one live left
+                }
             }
         }
     }

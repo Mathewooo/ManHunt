@@ -5,6 +5,9 @@ import gg.matthew.core.Teams;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.List;
@@ -23,10 +26,14 @@ public class NameTags {
         createNameTags(ManHunt.getInstance().getRunners(), Teams.RUNNER.getTeamName());
     }
 
+    //!!! nametags doens't work because player cannot have multiple scoreboards set to them!! potential fix is where the code's marked with "//"
     public void createNameTags(List<UUID> map, String teamName) {
         for (UUID uuid : map) {
             Player player = Bukkit.getPlayer(uuid);
-            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            Scoreboard scoreBoard = Bukkit.getScoreboardManager().getNewScoreboard();//
+            Objective objective = scoreBoard.registerNewObjective(String.valueOf(uuid), "none", "");//
+            objective.setDisplaySlot(DisplaySlot.BELOW_NAME);//
+            player.setScoreboard(scoreBoard);//
             for (Teams team : Teams.values()) {
                 Team scoreboardTeam = player.getScoreboard().registerNewTeam(team.getTeamName());
                 if (!team.getTeamName().equals(Teams.RUNNER.getTeamName())) scoreboardTeam.setColor(ChatColor.WHITE);

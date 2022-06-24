@@ -6,13 +6,11 @@ import gg.matthew.commands.manage.Stop;
 import gg.matthew.commands.manage.players.Hunters;
 import gg.matthew.commands.manage.players.Runners;
 import gg.matthew.core.particle.ParticleEffects;
-import gg.matthew.event.Events;
 import gg.overcast.api.command.CommandManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class Main extends JavaPlugin {
+public class Main extends JavaPlugin {
     //TODO implement log system of won games (with json storage)
     //TODO add interesting particle effect for winner
     //TODO implement permissions for stop and start command

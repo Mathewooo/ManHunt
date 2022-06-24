@@ -34,14 +34,16 @@ public class Start extends SubCommand {
     @Override
     public void perform(CommandSender sender, String[] args) {
         Player player = Bukkit.getPlayer(sender.getName());
-        if (PreGame.getInstance().hasPreGameCommand(player.getUniqueId()) && PreGame.getInstance().returnPreGameCommand(player.getUniqueId()) != null) {
-            if (!PreGame.getInstance().areInterfiereing(player.getUniqueId())) {
-                ManHunt.getInstance().setGameStarted();
-                ManHunt.getInstance().startGame();
-                PreGame.getInstance().removePreGames(player.getUniqueId());
-                Bukkit.broadcastMessage(ChatColor.WHITE + "ManHunt" + ChatColor.GRAY + " game has started" + ChatColor.WHITE + "!");
-            }
-        } else player.sendMessage(ChatColor.RED + "You haven't set both hunters and runners!");
+        if (!ManHunt.getInstance().hasGameStarted()) {
+            if (PreGame.getInstance().returnPreGameCommand(player.getUniqueId()) != null) {
+                if (!PreGame.getInstance().areInterfering(player.getUniqueId())) {
+                    ManHunt.getInstance().setGameStarted();
+                    ManHunt.getInstance().startGame(player.getUniqueId());
+                    PreGame.getInstance().removePreGames(player.getUniqueId());
+                    Bukkit.broadcastMessage(ChatColor.WHITE + "ManHunt" + ChatColor.GRAY + " game has started" + ChatColor.WHITE + "!");
+                }
+            } else player.sendMessage(ChatColor.RED + "You haven't set both hunters and runners!");
+        } else player.sendMessage(ChatColor.RED + "Manhunt game is currently running!");
     }
 
     @Override

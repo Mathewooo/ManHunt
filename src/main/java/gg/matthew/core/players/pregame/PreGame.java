@@ -21,11 +21,14 @@ public class PreGame {
 
     @SuppressWarnings("unchecked")
     public <Type> void createPreGame(UUID uuid, List<Type> list) {
-        Command.Builder commandBuilder = new Command.Builder();
-        preGameCommands.add(commandBuilder.setPlayerId(uuid).build());
+        if (!hasPreGameCommand(uuid)) {
+            Command.Builder commandBuilder = new Command.Builder();
+            preGameCommands.add(commandBuilder.setPlayerId(uuid).build());
+        }
         for (Command command : preGameCommands)
-            if (command.getPlayerId().equals(uuid)) if (list instanceof Hunter) command.setHunters((List<Hunter>) list);
-            else command.setRunners((List<UUID>) list);
+            if (command.getPlayerId().equals(uuid))
+                if (list.get(0) instanceof Hunter) command.setHunters((List<Hunter>) list);
+                else command.setRunners((List<UUID>) list);
     }
 
     public void removePreGames(UUID uuid) {
@@ -35,7 +38,8 @@ public class PreGame {
         preGameCommands.clear();
     }
 
-    public boolean areInterfiereing(UUID uuid) {
+    //TODO check if this works!!!
+    public boolean areInterfering(UUID uuid) {
         boolean bool = false;
         Command currentCommand = null;
         for (Command command : preGameCommands)
@@ -62,7 +66,7 @@ public class PreGame {
     public Command returnPreGameCommand(UUID uuid) {
         for (Command command : preGameCommands)
             if (command.getPlayerId().equals(uuid))
-                if (command.getRunners() != null && command.getHunters() != null) return command;
+                if (!command.getHunters().isEmpty() && !command.getRunners().isEmpty()) return command;
         return null;
     }
 

@@ -2,6 +2,8 @@ package gg.matthew.core;
 
 import gg.matthew.Main;
 import gg.matthew.core.nametags.NameTags;
+import gg.matthew.core.players.pregame.PreGame;
+import gg.matthew.core.players.pregame.model.Command;
 import gg.matthew.core.players.pregame.model.Hunter;
 import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
@@ -14,18 +16,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
 public class ManHunt {
+    //TODO !!! glowing doesn't work
+    //TODO implement countdown on game start for hunters so runners can have time to hide
     //TODO cache hunters position when they die and if they still have lives left after subtracting one and then when they'll respawn teleport them to the location
     private static ManHunt instance;
     private final Vector<Hunter> hunters = new Vector<>();
     private final Vector<UUID> runners = new Vector<>();
     private final LinkedHashMap<UUID, ItemStack> huntersCompasses = new LinkedHashMap<>();
     private final Vector<UUID> merged = new Vector<>();
-    BukkitTask task;
     NamespacedKey key = new NamespacedKey(Main.getInstance(), "hunter_compass");
     private boolean gameStarted = false;
 
@@ -72,11 +74,14 @@ public class ManHunt {
         return Collections.unmodifiableList(runners);
     }
 
-    public void setRunners(List<String> players) {
-        players.forEach(runner -> runners.add(Bukkit.getPlayer(runner).getUniqueId()));
+    public void setRunners(List<UUID> players) {
+        runners.addAll(players);
     }
 
-    public void startGame() {
+    public void startGame(UUID uuid) {
+        Command preGame = PreGame.getInstance().returnPreGameCommand(uuid);
+        setHunters(preGame.getHunters());
+        setRunners(preGame.getRunners());
         Events.getInstance().registerEvents();
         setMerged();
         closeInventories();
@@ -98,21 +103,13 @@ public class ManHunt {
         removeCompasses();
         hunters.clear();
         runners.clear();
-        cancelTask();
     }
 
     private void closeInventories() {
-        for (UUID uuid : merged) {
+        merged.forEach(uuid -> {
             Bukkit.getPlayer(uuid).closeInventory();
             Bukkit.getPlayer(uuid).getInventory().clear();
-        }
-    }
-
-    private void cancelTask() {
-        if (task != null) {
-            task.cancel();
-            task = null;
-        }
+        });
     }
 
     private void removeCompasses() {
@@ -165,9 +162,9 @@ public class ManHunt {
     }
 
     public List<UUID> returnFilteredHunters() {
-        List<UUID> hunters = new ArrayList<>();
-        ManHunt.getInstance().getHunters().forEach(hunter -> hunters.add(hunter.getPlayerId()));
-        return Collections.unmodifiableList(hunters);
+        List<UUID> filteredHunters = new ArrayList<>();
+        hunters.forEach(hunter -> filteredHunters.add(hunter.getPlayerId()));
+        return Collections.unmodifiableList(filteredHunters);
     }
 
     public Vector<UUID> getMerged() {
