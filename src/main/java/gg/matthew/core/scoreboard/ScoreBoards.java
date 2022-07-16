@@ -87,7 +87,7 @@ public class ScoreBoards {
     }
 
     //!!! GO by this: https://www.spigotmc.org/threads/how-do-i-update-the-scoreboard.398009/
-    private void updateStates(UUID uuid) {
+    public void updateStates(UUID uuid) {
         updateScore(true, uuid);
         updateScore(false, uuid);
     }

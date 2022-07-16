@@ -6,7 +6,10 @@ import gg.matthew.core.nametags.NameTags;
 import gg.matthew.core.players.pregame.model.Hunter;
 import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,7 +76,7 @@ public class Events implements Listener {
         Player killer = event.getEntity().getKiller();
         if (ManHunt.getInstance().getRunners().contains(player.getUniqueId())) {
             if (ManHunt.getInstance().returnFilteredHunters().contains(killer.getUniqueId())) {
-                ScoreBoards.getInstance().updateScoreBoards(player);
+                ScoreBoards.getInstance().updateStates(player.getUniqueId());
                 NameTags.getInstance().removeTag(player.getUniqueId());
                 ManHunt.getInstance().removeRunner(player.getUniqueId());
                 //TODO add the runner as spectator if the game is still running with at least one runner and hunter
@@ -83,7 +86,7 @@ public class Events implements Listener {
             if (ManHunt.getInstance().getRunners().contains(killer.getUniqueId())) {
                 Hunter hunterObject = ManHunt.getInstance().returnHunterObject(player.getUniqueId());
                 if (hunterObject.getLives() > 0) hunterObject.updateLives(hunterObject.getLives() - 1);
-                ScoreBoards.getInstance().updateScoreBoards(player);
+                ScoreBoards.getInstance().updateStates(player.getUniqueId());
                 if (hunterObject.getLives() == 0) {
                     NameTags.getInstance().removeTag(player.getUniqueId());
                     ManHunt.getInstance().removeHunter(player.getUniqueId());
