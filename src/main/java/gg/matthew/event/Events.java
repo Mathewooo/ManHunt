@@ -3,7 +3,6 @@ package gg.matthew.event;
 import gg.matthew.Main;
 import gg.matthew.core.ManHunt;
 import gg.matthew.core.nametags.NameTags;
-import gg.matthew.core.particle.armorstand.Circle;
 import gg.matthew.core.players.pregame.model.Hunter;
 import gg.matthew.core.scoreboard.ScoreBoards;
 import gg.matthew.core.utils.Utils;
@@ -63,7 +62,7 @@ public class Events implements Listener {
         Player killer = event.getEntity().getKiller();
         if (entity.equals(EntityType.ENDER_DRAGON))
             if (event.getEntity().getWorld().getEnvironment().equals(World.Environment.THE_END))
-                if (ManHunt.getInstance().getRunners().contains(killer.getUniqueId())) endGame(killer, "runners");
+                if (ManHunt.getInstance().getRunners().contains(killer.getUniqueId())) Utils.endGame(killer, "runners");
 
     }
 
@@ -78,7 +77,7 @@ public class Events implements Listener {
                 NameTags.getInstance().removeTag(player.getUniqueId());
                 ManHunt.getInstance().removeRunner(player.getUniqueId());
                 //TODO add the runner as spectator if the game is still running with at least one runner and hunter
-                if (ManHunt.getInstance().getRunners().isEmpty()) endGame(killer, "hunters");
+                if (ManHunt.getInstance().getRunners().isEmpty()) Utils.endGame(killer, "hunters");
             }
         } else if (ManHunt.getInstance().returnFilteredHunters().contains(player.getUniqueId())) {
             if (ManHunt.getInstance().getRunners().contains(killer.getUniqueId())) {
@@ -89,30 +88,10 @@ public class Events implements Listener {
                     NameTags.getInstance().removeTag(player.getUniqueId());
                     ManHunt.getInstance().removeHunter(player.getUniqueId());
                     //TODO add the hunter as spectator if he wasn't the last remaining
-                    if (ManHunt.getInstance().getHunters().isEmpty()) endGame(killer, "runners");
+                    if (ManHunt.getInstance().getHunters().isEmpty()) Utils.endGame(killer, "runners");
                 }
             }
         }
-    }
-
-    private void endGame(Player killer, String type) {
-        switch (type) {
-            case "runners" -> {
-                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 120, 255), 1.0F);
-                Circle.getInstance().winnerEffect(killer, dustOptions);
-                Utils.sendTitles(ManHunt.getInstance().getRunners(), ChatColor.BLUE + "You've won!", "Runner " + killer + " killed dragon!", true, killer.getUniqueId());
-                Utils.sendTitles(ManHunt.getInstance().returnFilteredHunters(), ChatColor.RED + "You've lost!", "", false, null);
-                Bukkit.broadcastMessage(ChatColor.BOLD.toString() + ChatColor.GRAY + killer.getName() + ChatColor.RESET + " Won as runner!");
-            }
-            case "hunters" -> {
-                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 120, 0), 1.0F);
-                Circle.getInstance().winnerEffect(killer, dustOptions);
-                Utils.sendTitles(ManHunt.getInstance().returnFilteredHunters(), ChatColor.BLUE + "You've won!", "Hunter " + killer + " killed last runner!", true, killer.getUniqueId());
-                Utils.sendTitles(ManHunt.getInstance().getRunners(), ChatColor.RED + "You've lost!", "", false, null);
-                Bukkit.broadcastMessage(ChatColor.BOLD.toString() + ChatColor.GRAY + killer.getName() + ChatColor.RESET + " Won as hunter!");
-            }
-        }
-        ManHunt.getInstance().cancelCurrentGame();
     }
 
     //TODO fix the things when you can put compass to chest or dispensers

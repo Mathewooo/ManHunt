@@ -1,7 +1,11 @@
 package gg.matthew.core.utils;
 
 import gg.matthew.core.ManHunt;
+import gg.matthew.core.particle.armorstand.Circle;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -52,5 +56,25 @@ public class Utils {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers())
             onlinePlayers.add(onlinePlayer.getName());
         return onlinePlayers;
+    }
+
+    public static void endGame(Player killer, String type) {
+        switch (type) {
+            case "runners" -> {
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 120, 255), 1.0F);
+                Circle.getInstance().winnerEffect(killer, dustOptions);
+                Utils.sendTitles(ManHunt.getInstance().getRunners(), ChatColor.BLUE + "You've won!", "Runner " + killer + " killed dragon!", true, killer.getUniqueId());
+                Utils.sendTitles(ManHunt.getInstance().returnFilteredHunters(), ChatColor.RED + "You've lost!", "", false, null);
+                Bukkit.broadcastMessage(ChatColor.BOLD.toString() + ChatColor.GRAY + killer.getName() + ChatColor.RESET + " Won as runner!");
+            }
+            case "hunters" -> {
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 120, 0), 1.0F);
+                Circle.getInstance().winnerEffect(killer, dustOptions);
+                Utils.sendTitles(ManHunt.getInstance().returnFilteredHunters(), ChatColor.BLUE + "You've won!", "Hunter " + killer + " killed last runner!", true, killer.getUniqueId());
+                Utils.sendTitles(ManHunt.getInstance().getRunners(), ChatColor.RED + "You've lost!", "", false, null);
+                Bukkit.broadcastMessage(ChatColor.BOLD.toString() + ChatColor.GRAY + killer.getName() + ChatColor.RESET + " Won as hunter!");
+            }
+        }
+        ManHunt.getInstance().cancelCurrentGame();
     }
 }

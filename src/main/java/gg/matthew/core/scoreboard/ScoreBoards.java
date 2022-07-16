@@ -4,24 +4,16 @@ import gg.matthew.core.ManHunt;
 import gg.matthew.core.players.pregame.model.Hunter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 //TODO !!!!fix all of the errors with the help of the lectures (lectures: 60,61)
 public class ScoreBoards {
     //!!! Scoreboards don't update and these are the problems: hunter's view(https://gyazo.com/abad3c76bb79ae3a1aa9ffd01042107a); runner's view(https://gyazo.com/35573a71d22c470fc65b968af6dc0f29)
     private static ScoreBoards instance;
-    Map<String, Scoreboard> scoreboards = new HashMap<>();
     String displayName = ChatColor.UNDERLINE.toString() + ChatColor.BOLD + "Manhunt Game";
     int scoreIndex;
     boolean[] booleans = new boolean[]{true, false};
-    Map<String, ChatColor> teamTypes = new HashMap<>();
-
     String splitter = ":";
 
     public static synchronized ScoreBoards getInstance() {
@@ -29,16 +21,18 @@ public class ScoreBoards {
         return instance;
     }
 
-    private void initializeBoards() {
-        for (Map.Entry<String, ChatColor> type : teamTypes.entrySet()) {
-            scoreIndex = ManHunt.getInstance().getMerged().size() + 2;
-            Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
-            scoreboards.put(type.getKey(), Bukkit.getScoreboardManager().getNewScoreboard());
-            Objective objective = scoreboards.get(type.getKey()).registerNewObjective("Manhunt", "win", displayName);
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-            formatScoreboard(objective, scoreboards.get(type.getKey()), type.getKey(), type.getValue());
-            scoreIndex = 0;
-        }
+    private void initializePlayerBoards() { // make the colors and stuff hex and configurable later
+        ManHunt.getInstance().returnFilteredHunters().forEach(hunter -> initialize(Bukkit.getPlayer(hunter).getScoreboard(), "hunters", ChatColor.RED));
+        ManHunt.getInstance().getRunners().forEach(runner -> initialize(Bukkit.getPlayer(runner).getScoreboard(), "runners", ChatColor.WHITE));
+    }
+
+    private void initialize(Scoreboard board, String team, ChatColor color) {
+        scoreIndex = ManHunt.getInstance().getMerged().size() + 2;
+        Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
+        Objective objective = board.registerNewObjective("Manhunt", "win", displayName);
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        formatScoreboard(objective, board, team, color);
+        scoreIndex = 0;
     }
 
     private void formatScoreboard(Objective objective, Scoreboard board, String team, ChatColor color) { //TODO !!! fix this problem with scoreboards https://gyazo.com/ac41d92082364447927f3e3c8ff0918d
@@ -59,8 +53,7 @@ public class ScoreBoards {
             setPrefixes(objective, returnTeam(board, team, hunter.getPlayerId()), team + hunter.getPlayerId(), Bukkit.getPlayer(hunter.getPlayerId()).getName() + " " + ChatColor.GRAY + hunter.getLives());
             Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
             scoreIndex--;
-        }
-        else for (UUID uuid : ManHunt.getInstance().getRunners()) {
+        } else for (UUID uuid : ManHunt.getInstance().getRunners()) {
             setPrefixes(objective, returnTeam(board, team, uuid), team + uuid, ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getName() + ChatColor.GRAY + " Alive");
             Bukkit.getLogger().info(String.valueOf(scoreIndex)); //
             scoreIndex--;
@@ -82,23 +75,8 @@ public class ScoreBoards {
         return gameTeam;
     }
 
-    private void setScoreboard(UUID uuid, boolean hunters) {
-        if (hunters) Bukkit.getPlayer(uuid).setScoreboard(scoreboards.get("hunters"));
-        else Bukkit.getPlayer(uuid).setScoreboard(scoreboards.get("runners"));
-    }
-
-    private void setUpdatedScoreboards(List<UUID> list, Scoreboard scoreboard) {
-        for (UUID uuid : list)
-            Bukkit.getPlayer(uuid).setScoreboard(scoreboard);
-    }
-
     public void createScoreBoards() {
-        teamTypes = initializeTypes();
-        initializeBoards();
-        ManHunt.getInstance().getMerged().forEach(player -> {
-            if (ManHunt.getInstance().returnFilteredHunters().contains(player)) setScoreboard(player, true);
-            else if (ManHunt.getInstance().getRunners().contains(player)) setScoreboard(player, false);
-        });
+        initializePlayerBoards();
     }
 
     public void removeScoreBoards() { //TODO scoreboards don't remove !!!
@@ -106,31 +84,30 @@ public class ScoreBoards {
             if (Bukkit.getPlayer(player).getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null)
                 Bukkit.getPlayer(player).getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
         });
-        scoreboards.clear();
     }
 
-    private Map<String, ChatColor> initializeTypes() { // make the colors and stuff hex and configurable later
-        Map<String, ChatColor> types = new HashMap<>();
-        types.put("hunters", ChatColor.RED);
-        types.put("runners", ChatColor.WHITE);
-        return types;
+    //!!! GO by this: https://www.spigotmc.org/threads/how-do-i-update-the-scoreboard.398009/
+    private void updateStates(UUID uuid) {
+        updateScore(true, uuid);
+        updateScore(false, uuid);
     }
 
-    public void updateScoreBoards(Player player) { // state "\\lives and etc. or if player is dead - left or freezed"
-        UUID uuid = player.getUniqueId();
-        for (Map.Entry<String, Scoreboard> scoreboard : scoreboards.entrySet()) {
-            updateStates(uuid, scoreboard.getValue());
-        }
-    }
-
-    private void updateStates(UUID uuid, Scoreboard scoreboard) {
-        if (ManHunt.getInstance().returnFilteredHunters().contains(uuid)) {
+    private void updateScore(boolean hunters, UUID player) {
+        if (hunters) for (UUID uuid : ManHunt.getInstance().returnFilteredHunters()) {
             int lives = ManHunt.getInstance().returnHunterObject(uuid).getLives();
-            setPrefix(scoreboard.getTeam("hunters" + splitter + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(ManHunt.getInstance().returnHunterObject(uuid).getPlayerId()) + " " + ChatColor.GRAY + (lives == 0 ? "Dead" : lives));
-            setUpdatedScoreboards(ManHunt.getInstance().returnFilteredHunters(), scoreboard);
-        } else if (ManHunt.getInstance().getRunners().contains(uuid)) {
-            setPrefix(scoreboard.getTeam("runners" + splitter + uuid), ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(uuid) + " " + ChatColor.GRAY + "Dead");
-            setUpdatedScoreboards(ManHunt.getInstance().getRunners(), scoreboard);
+            Score score = Bukkit.getPlayer(player).getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(ManHunt.getInstance().returnHunterObject(uuid).getPlayerId()) + " " + ChatColor.GRAY + (lives == 0 ? "Dead" : lives));
+            score.setScore(findScore(uuid, player, "hunters"));
+        } else for (UUID uuid : ManHunt.getInstance().getRunners()) {
+            Score score = Bukkit.getPlayer(player).getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(ChatColor.LIGHT_PURPLE.toString() + Bukkit.getPlayer(uuid) + " " + ChatColor.GRAY + "Dead");
+            score.setScore(findScore(uuid, player, "runners"));
         }
+    }
+
+    private int findScore(UUID uuid, UUID player, String type) {
+        String locator = type + splitter + player;
+        Scoreboard board = Bukkit.getPlayer(uuid).getScoreboard();
+        Score score = board.getObjective(DisplaySlot.SIDEBAR).getScore(locator);
+        board.resetScores(score.getEntry());
+        return score.getScore();
     }
 }

@@ -130,7 +130,7 @@ public class ManHunt {
         }
     }
 
-    //TODO lore doesn't work
+    //TODO lore doesn't work !!
     private void createCompasses() {
         ItemStack compass = new ItemStack(Material.COMPASS);
         CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
@@ -150,7 +150,6 @@ public class ManHunt {
         return Collections.unmodifiableMap(huntersCompasses);
     }
 
-    //TODO At some point implement configurable feature where only runners can see the glowing hunters not hunters seeing glowing hunter (can be done through nms) (implement in version 1.1)
     private void setGlowing() {
         for (UUID uuid : returnFilteredHunters())
             Bukkit.getPlayer(uuid).setGlowing(true);
