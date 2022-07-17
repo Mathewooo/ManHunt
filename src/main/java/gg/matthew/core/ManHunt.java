@@ -141,8 +141,10 @@ public class ManHunt {
                 compassMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + nearestPlayer.getName()));
             compass.setItemMeta(compassMeta);
             Bukkit.getPlayer(uuid).getInventory().setItemInOffHand(compass);
-            if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker"))
+            if (Objects.equals(Bukkit.getPlayer(uuid).getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING), "tracker")) {
+                Bukkit.getLogger().severe("Successfully registered tracker!");
                 huntersCompasses.put(uuid, Bukkit.getPlayer(uuid).getInventory().getItemInOffHand());
+            }
         }
     }
 

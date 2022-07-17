@@ -69,11 +69,4 @@ public class PreGame {
                 if (!command.getHunters().isEmpty() && !command.getRunners().isEmpty()) return command;
         return null;
     }
-
-    public List<UUID> returnCommandFilteredHunters(Command command) {
-        List<UUID> list = new ArrayList<>();
-        for (Hunter hunter : command.getHunters())
-            list.add(hunter.getPlayerId());
-        return list;
-    }
 }

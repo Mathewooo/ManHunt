@@ -7,11 +7,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
 public class Utils {
     public static Player isPlayerOnline(String name) {
@@ -76,5 +75,16 @@ public class Utils {
             }
         }
         ManHunt.getInstance().cancelCurrentGame();
+    }
+
+    public static ItemStack returnPlayerTracker(Player player) {
+        for (ItemStack itemStack : player.getInventory().getContents())
+            if (itemStack != null)
+                if (Objects.equals(itemStack.getItemMeta().getPersistentDataContainer().get(ManHunt.getInstance().getKey(), PersistentDataType.STRING), "tracker"))
+                    return itemStack;
+        if (player.getInventory().getItemInOffHand() != null)
+            if (Objects.equals(player.getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer().get(ManHunt.getInstance().getKey(), PersistentDataType.STRING), "tracker"))
+                return player.getInventory().getItemInOffHand();
+        return null;
     }
 }

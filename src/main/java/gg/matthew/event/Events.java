@@ -99,6 +99,7 @@ public class Events implements Listener {
 
     //TODO fix the things when you can put compass to chest or dispensers
     //TODO add option to disable join event when manhunt game is currently running
+    //TODO add option to disable move event for players who aren't playing
 
     //CHECK THIS IF IT WORKS!!
     //FIX lodestone glitching in end and nether
@@ -112,11 +113,13 @@ public class Events implements Listener {
                 nearestPlayer.setCompassTarget(player.getLocation());
                 ItemMeta itemMeta = ManHunt.getInstance().getHuntersCompasses().get(nearestPlayer.getUniqueId()).getItemMeta();
                 itemMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Nearest Runner: " + ChatColor.GRAY + player.getName()));
+                Utils.returnPlayerTracker(nearestPlayer).setItemMeta(itemMeta);
             } else for (Map.Entry<UUID, ItemStack> entry : ManHunt.getInstance().getHuntersCompasses().entrySet())
                 if (Bukkit.getPlayer(entry.getKey()) != null) {
                     ItemMeta itemMeta = entry.getValue().getItemMeta();
                     itemMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Runners went to different dimension"));
                     entry.getValue().setItemMeta(itemMeta);
+                    Utils.returnPlayerTracker(Bukkit.getPlayer(entry.getKey())).setItemMeta(itemMeta);
                 }
         }
     }
